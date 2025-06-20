@@ -9,6 +9,13 @@ import SwiftUI
 
 @main
 struct TaskMateApp: App {
+    
+    init() {
+
+        TMNotificationManager.shared.requestPermission()
+        
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
