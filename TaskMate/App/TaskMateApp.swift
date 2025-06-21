@@ -6,19 +6,16 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct TaskMateApp: App {
     
-    init() {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-        TMNotificationManager.shared.requestPermission()
-        
-    }
-    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TMWelcomeScreen()
         }
     }
 }

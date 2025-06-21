@@ -36,7 +36,9 @@ struct TMWelcomeScreen: View {
             
             // Get started btn
             Button(action: {
-                
+                TMAuthManager.shared.signinWithGoogle(presenting: getRootViewController()) { error in
+                    print("Error from signinWithGoogle: \(error?.localizedDescription ?? "")")
+                }
             }) {
                 Text("Get started")
                     .font(.headline)
