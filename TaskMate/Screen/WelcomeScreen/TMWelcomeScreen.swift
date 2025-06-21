@@ -19,10 +19,10 @@ struct TMWelcomeScreen: View {
             Image("welcome")
                 .resizable()
                 .scaledToFit()
-                .frame(width: .infinity)
+                .padding(.horizontal, 20)
             
             //Welcome title
-            Text("Welcome to Tasks")
+            Text("Welcome to TaskMate")
                 .font(.title)
                 .fontWeight(.semibold)
                 .multilineTextAlignment(.center)
