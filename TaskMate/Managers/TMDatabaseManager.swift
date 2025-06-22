@@ -19,7 +19,7 @@ class TMDatabaseManager {
         let provider = TMDatabaseManager(inMemory: true)
         let context = provider.context
         
-        let taskList = TaskLists(context: context)
+        let taskList = TaskList(context: context)
         taskList.title = "Office"
         taskList.createdDate = Date()
         
@@ -58,8 +58,8 @@ class TMDatabaseManager {
     }
     
     // MARK: - Create TaskList
-    func createTaskList(title: String) -> TaskLists {
-        let newList = TaskLists(context: context)
+    func createTaskList(title: String) -> TaskList {
+        let newList = TaskList(context: context)
         newList.id = UUID()
         newList.title = title
         newList.createdDate = Date()
@@ -78,7 +78,7 @@ class TMDatabaseManager {
                     isStarred: Bool = false,
                     starredDate: Date? = nil,
                     isCompleted: Bool = false,
-                    taskList: TaskLists) -> Task {
+                    taskList: TaskList) -> Task {
         
         let task = Task(context: context)
         task.id = UUID()
@@ -98,7 +98,7 @@ class TMDatabaseManager {
     }
     
     // MARK: - Update TaskList
-    func updateTaskList(_ list: TaskLists, newTitle: String) {
+    func updateTaskList(_ list: TaskList, newTitle: String) {
         list.title = newTitle
         saveContext()
     }
@@ -115,7 +115,7 @@ class TMDatabaseManager {
                     isStarred: Bool? = nil,
                     starredDate: Date? = nil,
                     isCompleted: Bool? = nil,
-                    taskList: TaskLists? = nil) {
+                    taskList: TaskList? = nil) {
         
         if let name = name { task.name = name }
         if let details = details { task.details = details }
@@ -133,7 +133,7 @@ class TMDatabaseManager {
     }
 
     // MARK: - Delete TaskList
-    func deleteTaskList(_ list: TaskLists) {
+    func deleteTaskList(_ list: TaskList) {
         context.delete(list)
         saveContext()
     }

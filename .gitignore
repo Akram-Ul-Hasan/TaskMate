@@ -25,6 +25,7 @@ fastlane/test_output
 
 # Firebase/Secrets
 GoogleService-Info.plist
+
 *.env
 *.xcconfig
 
