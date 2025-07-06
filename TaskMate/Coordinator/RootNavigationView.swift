@@ -9,32 +9,33 @@ import SwiftUI
 
 struct RootNavigationView: View {
     @EnvironmentObject var coordinator: AppCoordinator
-
+    
     var body: some View {
         NavigationStack(path: $coordinator.navigationPath) {
-            TMHomeScreen()
+            TMRootContentView()
                 .navigationDestination(for: CoordinatorRoute.self) { route in
                     switch route {
                     case .taskDetails(let taskID):
                         EmptyView()
+                    case .newTaskList:
+                        TMAddTaskListScreen()
                     }
                 }
                 .sheet(item: $coordinator.sheetRoute) { route in
                     switch route {
-                    case .newTask:
-                        EmptyView()
-                    case .taskOptions(let taskID):
-                        EmptyView()
-
-                    case .datePicker(let taskID):
-                        EmptyView()
-
-                    case .repeatOptions(let taskID):
-                        EmptyView()
+                    case .newTask(let taskList):
+                        TMAddTaskSheetView(taskList: taskList)
+                    case .listOptions:
+                        TMHomeOptionView()
 
                     case .listSelector:
-                        EmptyView()
-
+                        TMHomeTaskSelecterView()
+                    }
+                }
+                .fullScreenCover(item: $coordinator.fullScreenRoute) { route in
+                    switch route {
+                    case .repeatOptions:
+                        TMTaskRepeatSelectionScreen()
                     }
                 }
         }

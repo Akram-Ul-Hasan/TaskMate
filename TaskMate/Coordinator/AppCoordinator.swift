@@ -49,20 +49,31 @@ class AppCoordinator: ObservableObject {
 
 enum CoordinatorRoute: Hashable {
     case taskDetails(taskID: String)
+    case newTaskList
 }
 
 enum SheetRoute: Identifiable, Hashable {
-    var id: String { UUID().uuidString }
-    
-    case newTask
-    case taskOptions(taskID: String)
-    case datePicker(taskID: String)
-    case repeatOptions(taskID: String)
+    var id: String {
+        switch self {
+        case .newTask(let taskList):
+            return "newTask"
+            
+        case .listOptions:
+            return "listOptions"
+
+        case .listSelector:
+            return "listSelector"
+        }
+    }
+
+    case newTask(taskList: TaskList)
+    case listOptions
     case listSelector
 }
+
 
 enum FullScreenRoute: Identifiable, Hashable {
     var id: String { UUID().uuidString }
 
-    case onboarding
+    case repeatOptions
 }

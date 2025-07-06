@@ -12,10 +12,18 @@ import FirebaseCore
 struct TaskMateApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
+    
+    @StateObject private var databaseManager = TMDatabaseManager.shared
+    @StateObject private var appState = TMAppState()
+    @StateObject private var coordinator = AppCoordinator()
+    
     var body: some Scene {
         WindowGroup {
-            TMWelcomeScreen()
+            RootNavigationView()
+                .environment(\.managedObjectContext, databaseManager.context)
+                .environmentObject(databaseManager)
+                .environmentObject(coordinator)
+                .environmentObject(appState)
         }
     }
 }
