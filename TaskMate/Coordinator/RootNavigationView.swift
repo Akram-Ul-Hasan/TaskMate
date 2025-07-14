@@ -28,8 +28,8 @@ struct RootNavigationView: View {
                     case .listOptions:
                         TMHomeOptionView()
 
-                    case .listSelector:
-                        TMHomeTaskSelecterView()
+                    case .listSelector(let sheetHeight):
+                        TMHomeTaskSelecterView(sheetHeight: sheetHeight)
                     }
                 }
                 .fullScreenCover(item: $coordinator.fullScreenRoute) { route in

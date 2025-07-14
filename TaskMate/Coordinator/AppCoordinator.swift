@@ -61,14 +61,14 @@ enum SheetRoute: Identifiable, Hashable {
         case .listOptions:
             return "listOptions"
 
-        case .listSelector:
+        case .listSelector(let sheetHeight):
             return "listSelector"
         }
     }
 
     case newTask(taskList: TaskList)
     case listOptions
-    case listSelector
+    case listSelector(sheetHeight: CGFloat)
 }
 
 

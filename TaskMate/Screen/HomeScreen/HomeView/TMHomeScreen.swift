@@ -69,7 +69,7 @@ struct TMHomeScreen: View {
             
             TMHomeBottomView(
                 onMenuTap: {
-                    coordinator.presentSheet(.listSelector)
+                    coordinator.presentSheet(.listSelector(sheetHeight: CGFloat((taskLists.count + 1) * 60)))
                 }, onAddTaskTap: {
                     if let taskList = selectedTaskList {
                         coordinator.presentSheet(.newTask(taskList: taskList))
@@ -139,25 +139,21 @@ struct TMHomeScreen: View {
     }
 
     private var taskListView: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if tasks.isEmpty {
-                    Text("No tasks yet.")
-                        .foregroundColor(.gray)
-                        .padding()
-                } else {
-                    ForEach(tasks) { task in
-                        TMHomeTaskRowView(task: task) {
-                                
-                        } onToggleComplete: {
-                            updateCompleteStatus()
-                        }
-
+        VStack(alignment: .leading, spacing: 16) {
+            if tasks.isEmpty {
+                TMEmptyView(imageName: "emptyTask", title: "No Tasks Yet", subtitle: "Add your first task by tapping the plus button above")
+            } else {
+                ForEach(tasks) { task in
+                    TMHomeTaskRowView(task: task) {
+                        
+                    } onToggleComplete: {
+                        updateCompleteStatus()
                     }
+                    
                 }
             }
-            .padding()
         }
+        .padding()
     }
     
     private var selectedTaskList: TaskList? {
@@ -186,5 +182,6 @@ struct TMHomeScreen: View {
 #Preview {
     NavigationStack {
         TMHomeScreen()
+            .environmentObject(TMDatabaseManager.shared)        
     }
 }

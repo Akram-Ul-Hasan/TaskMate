@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct TMHomeTaskSelecterView: View {
+    let sheetHeight: CGFloat
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Starred Section
@@ -51,12 +53,11 @@ struct TMHomeTaskSelecterView: View {
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .padding(.horizontal)
-        .presentationDetents([.medium])
-        
+        .presentationDetents([.height(sheetHeight)])
     }
 }
         
 
 #Preview {
-    TMHomeTaskSelecterView()
+    TMHomeTaskSelecterView(sheetHeight: 200)
 }
