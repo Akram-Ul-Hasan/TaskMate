@@ -37,6 +37,7 @@ struct TMHomeScreen: View {
     
     @EnvironmentObject var db: TMDatabaseManager
     @EnvironmentObject var coordinator: AppCoordinator
+    @EnvironmentObject var networkMonitor: TMNetworkMonitor
     
     @FetchRequest(
         entity: TaskList.entity(),
@@ -59,36 +60,42 @@ struct TMHomeScreen: View {
     }
     
     var body: some View {
-        //        ZStack {
-        VStack {
-            listSelectorBar
-            
-            Divider()
-            
-            taskListView
-            
-            TMHomeBottomView(
-                onMenuTap: {
-                    coordinator.presentSheet(.listSelector(sheetHeight: CGFloat((taskLists.count + 1) * 60)))
-                }, onAddTaskTap: {
-                    if let taskList = selectedTaskList {
-                        coordinator.presentSheet(.newTask(taskList: taskList))
+        ZStack(alignment: .bottom) {
+            VStack {
+                listSelectorBar
+                
+                Divider()
+                
+                taskListView
+                
+                TMHomeBottomView(
+                    onMenuTap: {
+                        coordinator.presentSheet(.listSelector(sheetHeight: CGFloat((taskLists.count + 1) * 60)))
+                    }, onAddTaskTap: {
+                        if let taskList = selectedTaskList {
+                            print("Add new task button tapped")
+                            coordinator.presentSheet(.newTask(taskList: taskList))
+                        }
+                        
+                    }, onMoreTap: {
+                        coordinator.presentSheet(.listOptions)
+                    })
+                
+                .navigationTitle("Tasks")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        
                     }
-                    
-                }, onMoreTap: {
-                    coordinator.presentSheet(.listOptions)
-                })
-            
-            .navigationTitle("Tasks")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    
+                }
+                if networkMonitor.isConnected {
+                    TMOfflineBanner()
                 }
             }
         }
+        .ignoresSafeArea(edges: .bottom)
     }
-    //    }
+    
     private var listSelectorBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
@@ -182,6 +189,7 @@ struct TMHomeScreen: View {
 #Preview {
     NavigationStack {
         TMHomeScreen()
-            .environmentObject(TMDatabaseManager.shared)        
+            .environmentObject(TMDatabaseManager.shared)
+            .environmentObject(TMNetworkMonitor.shared)
     }
 }

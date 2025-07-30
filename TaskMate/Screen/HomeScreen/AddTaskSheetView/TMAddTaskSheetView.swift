@@ -10,6 +10,8 @@ import SwiftUI
 struct TMAddTaskSheetView: View {
     
     @EnvironmentObject private var db : TMDatabaseManager
+    @EnvironmentObject private var coordinator : AppCoordinator
+    
     let taskList: TaskList
     
     @State private var taskTitle = ""
@@ -21,6 +23,7 @@ struct TMAddTaskSheetView: View {
     @State private var showTaskDetails = false
     @State private var showDateTimeSheet = false
     
+    @FocusState private var isTitleFieldFocused: Bool
     
     private func saveTask() {
         db.createTask(name: taskTitle, details: taskDetails, date: date, time: time, isStarred: isStarred, starredDate: isStarred ? Date() : nil, taskList: taskList)
@@ -32,6 +35,7 @@ struct TMAddTaskSheetView: View {
                 .font(.title2.bold())
                 .padding(.horizontal)
                 .padding(.top)
+                .focused($isTitleFieldFocused)
             
             if showTaskDetails {
                 TextField("Add details", text: $taskDetails)
@@ -67,14 +71,20 @@ struct TMAddTaskSheetView: View {
                 
                 Button("Save") {
                     saveTask()
+                    coordinator.dismissSheet()
                 }
                 .disabled(taskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
                 .font(.headline)
                 .padding(.horizontal)
                 
             }
-            
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    isTitleFieldFocused = true
+                }
+            }
             .padding(.horizontal)
+            .presentationDetents([.height(100)])
             
             .sheet(isPresented: $showDateTimeSheet) {
                 TMTaskDateTimeSheetView(

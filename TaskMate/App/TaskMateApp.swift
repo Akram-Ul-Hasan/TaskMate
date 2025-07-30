@@ -24,6 +24,7 @@ struct TaskMateApp: App {
                 .environmentObject(databaseManager)
                 .environmentObject(coordinator)
                 .environmentObject(appState)
+                .environmentObject(TMNetworkMonitor.shared)
         }
     }
 }
