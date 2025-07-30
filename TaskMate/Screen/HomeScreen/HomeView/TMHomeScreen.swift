@@ -38,6 +38,7 @@ struct TMHomeScreen: View {
     @EnvironmentObject var db: TMDatabaseManager
     @EnvironmentObject var coordinator: AppCoordinator
     @EnvironmentObject var networkMonitor: TMNetworkMonitor
+    @EnvironmentObject var authManager: TMAuthManager
     
     @FetchRequest(
         entity: TaskList.entity(),
@@ -85,9 +86,31 @@ struct TMHomeScreen: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
+                        AsyncImage(url: authManager.photoURL) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 30, height: 30)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                                
+                            case .failure(_), .empty:
+                                Image(systemName: "person.crop.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.gray)
+                                
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
                         
                     }
                 }
+                
                 if networkMonitor.isConnected {
                     TMOfflineBanner()
                 }
@@ -191,5 +214,6 @@ struct TMHomeScreen: View {
         TMHomeScreen()
             .environmentObject(TMDatabaseManager.shared)
             .environmentObject(TMNetworkMonitor.shared)
+            .environmentObject(TMAuthManager.shared)
     }
 }
