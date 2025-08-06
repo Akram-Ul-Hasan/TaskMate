@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B159572E2E435857007BC1A3 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = B159572D2E435857007BC1A3 /* FirebaseFirestore */; };
 		C56475932E05A08A0079960A /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C56475922E05A08A0079960A /* Lottie */; };
 		C56476302E05FB7B0079960A /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C564762F2E05FB7B0079960A /* FirebaseAuth */; };
 		C56476322E05FB7B0079960A /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C56476312E05FB7B0079960A /* FirebaseCore */; };
@@ -49,6 +50,7 @@
 				C56476372E0600F90079960A /* GoogleSignIn in Frameworks */,
 				C56476322E05FB7B0079960A /* FirebaseCore in Frameworks */,
 				C56476302E05FB7B0079960A /* FirebaseAuth in Frameworks */,
+				B159572E2E435857007BC1A3 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +98,7 @@
 				C56476312E05FB7B0079960A /* FirebaseCore */,
 				C56476362E0600F90079960A /* GoogleSignIn */,
 				C56476382E0600F90079960A /* GoogleSignInSwift */,
+				B159572D2E435857007BC1A3 /* FirebaseFirestore */,
 			);
 			productName = TaskMate;
 			productReference = C53BB6BE2E01646E003AE7A9 /* TaskMate.app */;
@@ -392,6 +395,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B159572D2E435857007BC1A3 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C564762E2E05FB7B0079960A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
 		C56475922E05A08A0079960A /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C56475912E05A08A0079960A /* XCRemoteSwiftPackageReference "lottie-ios" */;
