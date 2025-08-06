@@ -39,4 +39,26 @@ final class TMNotificationManager: NSObject, ObservableObject, UNUserNotificatio
         completionHandler([.banner, .sound])
     }
     
+    func scheduleNotification(for task: Task) {
+        guard let dueDate = task.dueDate, dueDate > Date() else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Task Due"
+        content.body = task.title ?? ""
+        content.sound = .default
+
+        let reminderDate = Calendar.current.date(byAdding: .minute, value: -15, to: dueDate) ?? dueDate
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+
+        let request = UNNotificationRequest(identifier: task.id ?? "", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    func cancelNotification(for taskId: String) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [taskId])
+    }
+
+    
 }
