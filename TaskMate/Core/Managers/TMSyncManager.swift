@@ -11,7 +11,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import CoreData
 
-class SyncManager: ObservableObject {
+class TMSyncManager: ObservableObject {
     private let db = Firestore.firestore()
     @Published var isSyncing = false
     @Published var lastSyncDate: Date?
