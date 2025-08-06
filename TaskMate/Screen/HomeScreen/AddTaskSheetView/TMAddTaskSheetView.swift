@@ -17,12 +17,13 @@ struct TMAddTaskSheetView: View {
     @State private var taskTitle = ""
     @State private var taskDetails = ""
     @State private var isStarred = false
-    @State private var date: Date? = nil
-    @State private var time: Date? = nil
-    @State private var repeatType : RepeatType = .noRepeat
     @State private var showTaskDetails = false
     @State private var showDateTimeSheet = false
     
+    @State private var date: Date? = nil
+    @State private var time: Date? = nil
+    @State private var repeatType : RepeatType = .noRepeat
+
     @FocusState private var isTitleFieldFocused: Bool
     
     private func saveTask() {
@@ -88,16 +89,11 @@ struct TMAddTaskSheetView: View {
             
             .sheet(isPresented: $showDateTimeSheet) {
                 TMTaskDateTimeSheetView(
-                    selectedDate: Binding(
-                        get: { date ?? Date() },
-                        set: { date = $0 }
-                    ),
-                    selectedTime: Binding(
-                        get: { time ?? Date() },
-                        set: { time = $0 }
-                    ),
+                    selectedDate: $date,
+                    selectedTime: $time,
                     repeatOption: $repeatType
-                )            }
+                )
+            }
         }
     }
 }

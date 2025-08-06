@@ -6,8 +6,31 @@
 //
 
 import SwiftUI
+import Combine
+import OSLog
 
-class AppCoordinator: ObservableObject {
+// MARK: - Navigation Protocols
+
+/// Protocol defining navigation capabilities
+protocol NavigationCoordinator: ObservableObject {
+    associatedtype Route: Hashable
+    associatedtype SheetRoute: Identifiable & Hashable
+    associatedtype FullScreenRoute: Identifiable & Hashable
+    
+    var navigationPath: NavigationPath { get set }
+    var currentSheet: SheetRoute? { get set }
+    var currentFullScreen: FullScreenRoute? { get set }
+    
+    func navigate(to route: Route)
+    func pop()
+    func popToRoot()
+    func presentSheet(_ route: SheetRoute)
+    func dismissSheet()
+    func presentFullScreen(_ route: FullScreenRoute)
+    func dismissFullScreen()
+}
+
+class NavigationCoordinator: ObservableObject {
 
     @Published var navigationPath: [CoordinatorRoute] = []
     
@@ -52,23 +75,25 @@ enum CoordinatorRoute: Hashable {
     case newTaskList
 }
 
-enum SheetRoute: Identifiable, Hashable {
+enum SheetRoute: Identifiable, Hashable, Equatable {
+    case newTask(taskList: TaskList)
+    case listOptions
+    case listSelector(sheetHeight: CGFloat)
+    
+    
+    
     var id: String {
         switch self {
-        case .newTask(let taskList):
+        case .newTask:
             return "newTask"
             
         case .listOptions:
             return "listOptions"
 
-        case .listSelector(let sheetHeight):
+        case .listSelector:
             return "listSelector"
         }
     }
-
-    case newTask(taskList: TaskList)
-    case listOptions
-    case listSelector(sheetHeight: CGFloat)
 }
 
 
@@ -76,4 +101,17 @@ enum FullScreenRoute: Identifiable, Hashable {
     var id: String { UUID().uuidString }
 
     case repeatOptions
+}
+
+enum ListOptionAction {
+    case rename
+    case delete
+    case deleteAll
+    case sort(SortOption)
+}
+
+enum SortOption: String, CaseIterable {
+    case alphabetical = "A–Z"
+    case date = "Date"
+    case starred = "Starred recently"
 }

@@ -13,27 +13,28 @@ enum FocusedSection {
   
 struct TMTaskDateTimeSheetView: View {
     
-    @EnvironmentObject var coordinator: AppCoordinator
-
-    @Binding var selectedDate: Date
+    @Environment(\.dismiss) private var dismiss
+    
+    @Binding var selectedDate: Date?
     @Binding var selectedTime: Date?
     @Binding var repeatOption: RepeatType
+    
+    @State private var internalSelectedDate: Date = Date()
 
     @State private var focused: FocusedSection = .date
 
     var body: some View {
         VStack(spacing: 0) {
             Spacer()
-
+            
             header
-                .padding(.bottom, 20)
-
-            // MARK: - Date Section
+                .padding(.bottom, 10)
+            
             Group {
                 if focused == .date {
                     DatePicker(
                         "",
-                        selection: $selectedDate,
+                        selection: $internalSelectedDate,
                         displayedComponents: .date
                     )
                     .datePickerStyle(.graphical)
@@ -52,7 +53,7 @@ struct TMTaskDateTimeSheetView: View {
                     )
                 }
             }
-
+            
             
             // MARK: - Time Section
             SectionHeader(
@@ -68,12 +69,12 @@ struct TMTaskDateTimeSheetView: View {
                     withAnimation {
                         focused = .time
                         if selectedTime == nil {
-                            selectedTime = Date() // Default to now
+                            selectedTime = Date()
                         }
                     }
                 }
             )
-
+            
             if focused == .time, let timeBinding = Binding($selectedTime) {
                 DatePicker(
                     "",
@@ -86,18 +87,23 @@ struct TMTaskDateTimeSheetView: View {
                 .clipped()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
-
+            
             SectionHeader(
                 title: repeatOption.description,
-                    isSelected: false,
-                    onTap: {
-                        // Show repeat options
-                        print("Repeat tapped")
-                        // Present sheet or navigate
-                    }
-                )
+                isSelected: false,
+                onTap: {
+                    print("Repeat tapped")
+                }
+            )
+        }
+        .onAppear {
+            internalSelectedDate = selectedDate ?? Date()
+        }
+        .onDisappear {
+            selectedDate = internalSelectedDate
         }
         .padding()
+        .presentationDetents(focused == .date ? [.height(550)] : [.height(420)])
     }
     
     
@@ -107,12 +113,18 @@ struct TMTaskDateTimeSheetView: View {
                 .font(.headline)
             Spacer()
             Button("Done") {
-                coordinator.dismissSheet()
+                dismiss()
             }
         }
         .padding()
     }
-
+    
+    private var selectedDateFormatted: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, dd MMM"
+        return formatter.string(from: internalSelectedDate)
+    }
+    
     private var selectedTimeFormatted: String {
         if let time = selectedTime {
             let formatter = DateFormatter()
@@ -122,13 +134,6 @@ struct TMTaskDateTimeSheetView: View {
             return "Select Time"
         }
     }
-    
-    private var selectedDateFormatted: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEE, d MMM" // e.g., "Thu, 3 Jul"
-        return formatter.string(from: selectedDate)
-    }
-
 }
 
 #Preview {
@@ -136,7 +141,7 @@ struct TMTaskDateTimeSheetView: View {
 }
 
 private struct PreviewWrapper: View {
-    @State private var selectedDate: Date = Date()
+    @State private var selectedDate: Date? = Date()
     @State private var selectedTime: Date?
     @State private var repeatOption: RepeatType = .noRepeat
 

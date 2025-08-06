@@ -10,6 +10,7 @@ import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn
 
+
 final class TMAuthManager: NSObject, ObservableObject {
     static let shared = TMAuthManager()
     

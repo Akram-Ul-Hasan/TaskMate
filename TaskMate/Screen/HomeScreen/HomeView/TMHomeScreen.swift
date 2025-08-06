@@ -6,59 +6,25 @@
 //
 
 import SwiftUI
-
-enum SelectedList: Identifiable, Equatable {
-    case starred
-    case taskList(TaskList)
-    
-    var id: UUID {
-        switch self {
-        case .starred:
-            return UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
-        case .taskList(let list):
-            return list.id!
-            
-        }
-    }
-    
-    var title: String {
-        switch self {
-        case .starred:
-            return "⭐"
-        case .taskList(let list):
-            return list.title ?? "Untitled"
-
-        }
-    }
-}
-
+import CoreData
 
 struct TMHomeScreen: View {
     
-    @EnvironmentObject var db: TMDatabaseManager
+    @Environment(\.managedObjectContext) private var context
     @EnvironmentObject var coordinator: AppCoordinator
     @EnvironmentObject var networkMonitor: TMNetworkMonitor
     @EnvironmentObject var authManager: TMAuthManager
     
     @FetchRequest(
         entity: TaskList.entity(),
-        sortDescriptors: [],
+        sortDescriptors: [ NSSortDescriptor(keyPath: \TaskList.createdDate, ascending: true)],
         animation: .default
     )
     private var taskLists: FetchedResults<TaskList>
     
-    @State private var selectedList: SelectedList = .starred
-    @State private var selectedSort: SortOption = .date
-    @State private var tasks: [Task] = []
-    @State private var showNewTaskSheet = false
+    @StateObject var viewModel: TMHomeScreenViewModel
     
-    func fetchAssociateTasks() {
-        tasks = db.fetchTasks(for: selectedList, selectedSort: selectedSort)
-    }
-    
-    func updateCompleteStatus() {
-//        db.updateTask()
-    }
+    @Namespace private var animationNamespace
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -73,41 +39,20 @@ struct TMHomeScreen: View {
                     onMenuTap: {
                         coordinator.presentSheet(.listSelector(sheetHeight: CGFloat((taskLists.count + 1) * 60)))
                     }, onAddTaskTap: {
-                        if let taskList = selectedTaskList {
-                            print("Add new task button tapped")
+                        if let taskList = viewModel.selectedTaskList {
                             coordinator.presentSheet(.newTask(taskList: taskList))
                         }
                         
                     }, onMoreTap: {
                         coordinator.presentSheet(.listOptions)
-                    })
+                    }
+                )
                 
-                .navigationTitle("Tasks")
+                .navigationTitle(TMStrings.Home.title)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        AsyncImage(url: authManager.photoURL) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 30, height: 30)
-                                    .clipShape(Circle())
-                                    .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                                
-                            case .failure(_), .empty:
-                                Image(systemName: "person.crop.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundColor(.gray)
-                                
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
-                        
+                        TMUserProfileButton(photoURL: authManager.photoURL)
                     }
                 }
                 
@@ -122,32 +67,30 @@ struct TMHomeScreen: View {
     private var listSelectorBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
-                
                 Button(action: {
-                    withAnimation {
-                        selectedList = .starred
-                        fetchAssociateTasks()
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        viewModel.selectedList = .starred
+                        
                     }
                 }) {
                     VStack(spacing: 4) {
                         Image(systemName: "star.fill")
-                            .foregroundColor(selectedList == .starred ? .blue : .gray)
+                            .foregroundColor(viewModel.selectedList == .starred ? .blue : .gray)
                         underlineView(for: .starred)
                     }
                 }
-
+                
                 ForEach(taskLists) { list in
                     let current = SelectedList.taskList(list)
                     Button(action: {
-                        withAnimation {
-                            selectedList = current
-                            fetchAssociateTasks()
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            viewModel.selectedList = current
                         }
                     }) {
                         VStack(spacing: 4) {
                             Text(list.title ?? "Untitled")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(selectedList == current ? Color.blue : .primary)
+                                .foregroundColor(viewModel.selectedList == current ? Color.blue : .primary)
                             underlineView(for: current)
                         }
                     }
@@ -156,7 +99,7 @@ struct TMHomeScreen: View {
                 Button {
                     coordinator.push(.newTaskList)
                 } label: {
-                    Text("+ New list")
+                    Text(TMStrings.Home.newTaskListButtonTitle)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(.blackLevel1)
                         .padding(.horizontal, 8)
@@ -167,18 +110,18 @@ struct TMHomeScreen: View {
             .padding(.top, 12)
         }
     }
-
+    
     private var taskListView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if tasks.isEmpty {
-                TMEmptyView(imageName: "emptyTask", title: "No Tasks Yet", subtitle: "Add your first task by tapping the plus button above")
+            if viewModel.filteredTasks.isEmpty {
+                TMEmptyView(imageName: TMImages.emptyTask, title: TMStrings.Home.emptyTaskTitle, subtitle: TMStrings.Home.emptyTaskDescription)
             } else {
-                ForEach(tasks) { task in
-                    TMHomeTaskRowView(task: task) {
+                ForEach(viewModel.filteredTasks) { task in
+                    TMHomeTaskRowView(task: task, onToggleStar: {
                         
-                    } onToggleComplete: {
-                        updateCompleteStatus()
-                    }
+                    }, onToggleComplete: {
+                        
+                    })
                     
                 }
             }
@@ -186,33 +129,34 @@ struct TMHomeScreen: View {
         .padding()
     }
     
-    private var selectedTaskList: TaskList? {
-        if case .taskList(let list) = selectedList {
-            return list
-        }
-        return nil
-    }
     
     @ViewBuilder
     private func underlineView(for item: SelectedList) -> some View {
-        if selectedList == item {
+        if viewModel.selectedList == item {
             RoundedRectangle(cornerRadius: 2)
                 .fill(Color.blue)
                 .frame(height: 3)
                 .padding(.top, 2)
-                .matchedGeometryEffect(id: "underline", in: Namespace().wrappedValue)
+                .matchedGeometryEffect(id: "underline", in: animationNamespace)
         } else {
             Color.clear.frame(height: 3).padding(.top, 2)
         }
     }
-
 }
 
 
 #Preview {
+    let context = TMDatabaseManager.preview.context
+    let coordinator = AppCoordinator()
+    let networkManager = TMNetworkMonitor.shared
+    let authManager = TMAuthManager.shared
+    
+    let viewModel = TMHomeScreenViewModel(context: context)
+    
     NavigationStack {
-        TMHomeScreen()
-            .environmentObject(TMDatabaseManager.shared)
+        TMHomeScreen(viewModel: viewModel)
+            .environment(\.managedObjectContext, context)
+            .environmentObject(AppCoordinator())
             .environmentObject(TMNetworkMonitor.shared)
             .environmentObject(TMAuthManager.shared)
     }

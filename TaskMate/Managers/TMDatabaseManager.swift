@@ -17,22 +17,29 @@ class TMDatabaseManager: ObservableObject {
         persistentContainer.viewContext
     }
     
-    //    static var preview: TMDatabaseManager = {
-    //        let provider = TMDatabaseManager(inMemory: true)
-    //        let context = provider.context
-    //
-    //        let taskList = TaskList(context: context)
-    //        taskList.title = "Office"
-    //        taskList.createdDate = Date()
-    //
-    //        do {
-    //            try context.save()
-    //        } catch {
-    //            print(error)
-    //        }
-    //
-    //        return provider
-    //    }()
+    static var preview: TMDatabaseManager = {
+        let provider = TMDatabaseManager(inMemory: true)
+        let context = provider.context
+        
+        let taskList = TaskList(context: context)
+        taskList.title = "Office"
+        taskList.createdDate = Date()
+        
+        let task = Task(context: context)
+        task.name = "Finish iOS module"
+        task.isCompleted = false
+        task.isStarred = true
+        task.createdDate = Date()
+        task.taskList = taskList
+        
+        do {
+            try context.save()
+        } catch {
+            print("Preview context save error: \(error)")
+        }
+        
+        return provider
+    }()
     
     init(inMemory: Bool = false) {
         self.persistentContainer = NSPersistentContainer(name: "TaskMateModel")

@@ -15,7 +15,6 @@ struct TMHomeTaskRowView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             
-            // Checkbox circle
             Button(action: {
                 onToggleComplete()
             }) {
@@ -25,19 +24,16 @@ struct TMHomeTaskRowView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                // Title
                 Text(task.name ?? "")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.primary)
 
-                // Subtitle/details (if exists)
                 if let details = task.details, !details.isEmpty {
                     Text(details)
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                 }
 
-                // Date and Time (if exists)
                 if let date = task.date, let time = task.time {
                     let formatted = format(date: date, time: time)
                     Text(formatted)
@@ -54,7 +50,6 @@ struct TMHomeTaskRowView: View {
 
             Spacer()
 
-            // Star icon
             Button(action: {
                 onToggleStar()
             }) {

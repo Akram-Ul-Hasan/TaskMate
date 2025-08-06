@@ -26,4 +26,5 @@ struct TMRootContentView: View {
 }
 #Preview {
     TMRootContentView()
+        .environmentObject(TMAppState())
 }

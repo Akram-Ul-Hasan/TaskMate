@@ -26,7 +26,7 @@ struct RootNavigationView: View {
                     case .newTask(let taskList):
                         TMAddTaskSheetView(taskList: taskList)
                     case .listOptions:
-                        TMHomeOptionView()
+                        TMHomeOptionView(currentSort: <#SortOption#>, canDeleteList: <#Bool#>, onSortSelected: <#(SortOption) -> Void#>, onRenameList: <#() -> Void#>, onDeleteList: <#() -> Void#>, onDeleteAllCompletedTasks: <#() -> Void#>)
 
                     case .listSelector(let sheetHeight):
                         TMHomeTaskSelecterView(sheetHeight: sheetHeight)
