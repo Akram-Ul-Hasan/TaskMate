@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TaskFilter: CaseIterable {
+enum TMTaskFilter: CaseIterable {
     case all, today, upcoming, completed, overdue
     
     var title: String {

@@ -10,7 +10,7 @@ import SwiftUI
 struct TMAddTaskSheetView: View {
     
     @EnvironmentObject private var db : TMDatabaseManager
-    @EnvironmentObject private var coordinator : AppCoordinator
+    @EnvironmentObject private var coordinator : NavigationCoordinator
     
     let taskList: TaskList
     
@@ -27,7 +27,7 @@ struct TMAddTaskSheetView: View {
     @FocusState private var isTitleFieldFocused: Bool
     
     private func saveTask() {
-        db.createTask(name: taskTitle, details: taskDetails, date: date, time: time, isStarred: isStarred, starredDate: isStarred ? Date() : nil, taskList: taskList)
+//        db.createTask(name: taskTitle, details: taskDetails, date: date, time: time, isStarred: isStarred, starredDate: isStarred ? Date() : nil, taskList: taskList)
     }
     
     var body: some View {

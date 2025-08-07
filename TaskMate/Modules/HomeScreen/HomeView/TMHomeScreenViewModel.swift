@@ -8,19 +8,21 @@
 import Foundation
 import CoreData
 
-enum SelectedList: Identifiable, Equatable {
+enum SelectedList:  Equatable {
+    
     case starred
     case taskList(TaskList)
     
-    var id: UUID {
-        switch self {
-        case .starred:
-            return UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
-        case .taskList(let list):
-            return list.id!
-            
-        }
-    }
+//    var id: UUID {
+//        switch self {
+//        case .starred:
+//            return UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+////        case .taskList(let list):
+////            return list.id
+////
+//
+//        }
+//    }
     
     var title: String {
         switch self {
@@ -35,7 +37,7 @@ enum SelectedList: Identifiable, Equatable {
 
 class TMHomeScreenViewModel: ObservableObject {
     @Published var selectedList: SelectedList = .starred
-    @Published var selectedSort: SortOption = .date
+    @Published var selectedSort: TMSortOption = .dateCreated
     
     private let context: NSManagedObjectContext
     
@@ -61,12 +63,14 @@ class TMHomeScreenViewModel: ObservableObject {
         case .taskList(let list):
             request.predicate = NSPredicate(format: "taskList == %@", list)
             switch selectedSort {
-            case .date:
+            case .dateCreated:
                 request.sortDescriptors = [NSSortDescriptor(keyPath: \Task.createdDate, ascending: true)]
             case .alphabetical:
-                request.sortDescriptors = [NSSortDescriptor(keyPath: \Task.name, ascending: true)]
-            case .starred:
-                request.sortDescriptors = [NSSortDescriptor(keyPath: \Task.starredDate, ascending: false)]
+                request.sortDescriptors = [NSSortDescriptor(keyPath: \Task.title, ascending: true)]
+//            case .starred:
+//                request.sortDescriptors = [NSSortDescriptor(keyPath: \Task.starredDate, ascending: false)]
+            default:
+                break
             }
         }
         

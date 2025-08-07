@@ -11,9 +11,9 @@ import SwiftUI
 struct TMHomeOptionView: View {
     @Environment(\.dismiss) private var dismiss
     
-    @State private var selectedSort: SortOption
+    @State private var selectedSort: TMSortOption
     
-    var onSortSelected: (SortOption) -> Void
+    var onSortSelected: (TMSortOption) -> Void
     var onRenameList: () -> Void
     var onDeleteList: () -> Void
     var onDeleteAllCompletedTasks: () -> Void
@@ -21,9 +21,9 @@ struct TMHomeOptionView: View {
     var canDeleteList: Bool
     
     init(
-        currentSort: SortOption,
+        currentSort: TMSortOption,
         canDeleteList: Bool,
-        onSortSelected: @escaping (SortOption) -> Void,
+        onSortSelected: @escaping (TMSortOption) -> Void,
         onRenameList: @escaping () -> Void,
         onDeleteList: @escaping () -> Void,
         onDeleteAllCompletedTasks: @escaping () -> Void
@@ -42,7 +42,7 @@ struct TMHomeOptionView: View {
                 .font(.headline)
                 .padding(.top)
             
-            ForEach(SortOption.allCases, id: \.self) { option in
+            ForEach(TMSortOption.allCases, id: \.self) { option in
                 HStack {
                     Text(option.rawValue)
                     Spacer()

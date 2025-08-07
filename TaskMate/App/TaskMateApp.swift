@@ -13,19 +13,24 @@ struct TaskMateApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @StateObject private var databaseManager = TMDatabaseManager.shared
-    @StateObject private var appState = TMAppState()
-    @StateObject private var coordinator = AppCoordinator()
+//    @StateObject private var appState = TMAppState()
+    @StateObject private var coordinator = NavigationCoordinator()
+    @StateObject private var authManager = TMAuthManager.shared
+    @StateObject private var taskManager = TMTaskManager()
+    @StateObject private var syncManager = TMSyncManager()
+    @StateObject private var settingsManager = TMSettingsManager.shared
     
     var body: some Scene {
         WindowGroup {
             RootNavigationView()
-                .environment(\.managedObjectContext, databaseManager.context)
-                .environmentObject(databaseManager)
                 .environmentObject(coordinator)
-                .environmentObject(appState)
-                .environmentObject(TMNetworkMonitor.shared)
-                .environmentObject(TMAuthManager.shared)
+                .environmentObject(authManager)
+                .environmentObject(taskManager)
+                .environmentObject(syncManager)
+                .environmentObject(settingsManager)
+                .environment(\.managedObjectContext, TMDatabaseManager.shared.context)
+                .preferredColorScheme(settingsManager.theme.colorScheme)
+            
         }
     }
 }

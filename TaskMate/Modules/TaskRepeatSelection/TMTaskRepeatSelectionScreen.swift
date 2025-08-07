@@ -34,7 +34,7 @@ enum RepeatType: CaseIterable {
 }
 
 struct TMTaskRepeatSelectionScreen: View {
-    @EnvironmentObject private var coordinator : AppCoordinator
+    @EnvironmentObject private var coordinator : NavigationCoordinator
     
     var body: some View {
         ScrollView {

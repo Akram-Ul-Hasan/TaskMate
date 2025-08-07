@@ -18,7 +18,7 @@ class TMTaskManager: ObservableObject {
     @Published var taskLists: [TaskList] = []
     @Published var tasks: [Task] = []
     @Published var selectedListId: String?
-    @Published var currentFilter: TaskFilter = .all
+    @Published var currentFilter: TMTaskFilter = .all
     @Published var searchText = ""
     @Published var viewType: ViewType = .list
     

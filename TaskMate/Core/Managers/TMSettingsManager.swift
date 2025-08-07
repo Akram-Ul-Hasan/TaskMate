@@ -9,7 +9,9 @@ import Foundation
 
 class TMSettingsManager: ObservableObject {
     
-    @Published var theme: AppTheme = .system
+    static let shared = TMSettingsManager()
+    
+    @Published var theme: TMAppTheme = .system
     @Published var showCompletedTasks = true
     @Published var defaultPriority: TMTaskPriority = .medium
     @Published var enableNotifications = true
@@ -17,13 +19,13 @@ class TMSettingsManager: ObservableObject {
     
     private let userDefaults = UserDefaults.standard
     
-    init() {
+    private init() {
         loadSettings()
     }
     
     private func loadSettings() {
         if let themeString = userDefaults.string(forKey: "theme"),
-           let savedTheme = AppTheme(rawValue: themeString) {
+           let savedTheme = TMAppTheme(rawValue: themeString) {
             theme = savedTheme
         }
         

@@ -9,12 +9,12 @@ import SwiftUI
 
 struct TMAddTaskListScreen: View {
     
-    @EnvironmentObject private var coordinator : AppCoordinator
+    @EnvironmentObject private var coordinator : NavigationCoordinator
     @EnvironmentObject private var db : TMDatabaseManager
     @State private var taskListTitle = ""
     
     func saveTaskList() {
-        db.createTaskList(title: taskListTitle)
+//        db.createTaskList(title: taskListTitle)
     }
     
     var body: some View {

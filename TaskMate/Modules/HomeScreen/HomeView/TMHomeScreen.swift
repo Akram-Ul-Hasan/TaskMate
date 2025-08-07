@@ -11,7 +11,7 @@ import CoreData
 struct TMHomeScreen: View {
     
     @Environment(\.managedObjectContext) private var context
-    @EnvironmentObject var coordinator: AppCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
     @EnvironmentObject var networkMonitor: TMNetworkMonitor
     @EnvironmentObject var authManager: TMAuthManager
     
@@ -37,14 +37,14 @@ struct TMHomeScreen: View {
                 
                 TMHomeBottomView(
                     onMenuTap: {
-                        coordinator.presentSheet(.listSelector(sheetHeight: CGFloat((taskLists.count + 1) * 60)))
+//                        coordinator.presentSheet(.listSelector(sheetHeight: CGFloat((taskLists.count + 1) * 60)))
                     }, onAddTaskTap: {
                         if let taskList = viewModel.selectedTaskList {
-                            coordinator.presentSheet(.newTask(taskList: taskList))
+//                            coordinator.presentSheet(.newTask(taskList: taskList))
                         }
                         
                     }, onMoreTap: {
-                        coordinator.presentSheet(.listOptions)
+//                        coordinator.presentSheet(.listOptions)
                     }
                 )
                 
@@ -52,7 +52,7 @@ struct TMHomeScreen: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        TMUserProfileButton(photoURL: authManager.photoURL)
+//                        TMUserProfileButton(photoURL: authManager.photoURL)
                     }
                 }
                 
@@ -147,7 +147,7 @@ struct TMHomeScreen: View {
 
 #Preview {
     let context = TMDatabaseManager.preview.context
-    let coordinator = AppCoordinator()
+    let coordinator = NavigationCoordinator()
     let networkManager = TMNetworkMonitor.shared
     let authManager = TMAuthManager.shared
     
@@ -156,7 +156,7 @@ struct TMHomeScreen: View {
     NavigationStack {
         TMHomeScreen(viewModel: viewModel)
             .environment(\.managedObjectContext, context)
-            .environmentObject(AppCoordinator())
+            .environmentObject(NavigationCoordinator())
             .environmentObject(TMNetworkMonitor.shared)
             .environmentObject(TMAuthManager.shared)
     }
