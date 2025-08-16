@@ -47,7 +47,7 @@ class TMDatabaseManager: ObservableObject {
         if inMemory {
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         }
-        
+//        resetPersistentStore()
         container.loadPersistentStores { _, error in
             if let error {
                 fatalError("Core Data Store failed to initialize: \(error.localizedDescription)")
@@ -81,6 +81,7 @@ class TMDatabaseManager: ObservableObject {
         if context.hasChanges {
             do {
                 try context.save()
+                print("successfully saved context")
             } catch {
                 print("Failed to save: \(error.localizedDescription)")
             }

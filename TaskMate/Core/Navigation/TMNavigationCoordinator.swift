@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
+import Combine
 
-class NavigationCoordinator: ObservableObject {
+class TMNavigationCoordinator: ObservableObject {
     
     @Published var appState: TMAppState = .splash
     @Published var navigationStack: [TMNavigationRoute] = []
     @Published var presentedSheet: TMSheetRoute?
     @Published var presentedFullScreen: TMFullScreenRoute?
-    
+
     @Published var selectedTaskListID: String?
     @Published var selectedTask: Task?
     
@@ -23,10 +24,13 @@ class NavigationCoordinator: ObservableObject {
     private let authManager: TMAuthManager
     private let settingsManager: TMSettingsManager
     
+    private var cancellables = Set<AnyCancellable>()
+
     init(authManager: TMAuthManager = TMAuthManager.shared, settingsManager: TMSettingsManager = TMSettingsManager.shared) {
         self.authManager = authManager
         self.settingsManager = settingsManager
         setupInitialState()
+        observeAuthChanges()
     }
     
     private func setupInitialState() {
@@ -37,6 +41,22 @@ class NavigationCoordinator: ObservableObject {
         } else {
             appState = .main
         }
+    }
+    
+    private func observeAuthChanges() {
+        authManager.$isAuthenticated
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAuthenticated in
+                guard let self = self else { return }
+                if !self.settingsManager.hasCompletedOnboarding {
+                    self.appState = .onboarding
+                } else if !isAuthenticated {
+                    self.appState = .authentication
+                } else {
+                    self.appState = .main
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func navigateToMain() {
@@ -102,9 +122,8 @@ class NavigationCoordinator: ObservableObject {
     }
     
     // MARK: - Convenience Methods
-    func showTaskDetail(_ task: Task) {
-        selectedTask = task
-        push(.taskDetail(taskID: task.id ?? ""))
+    func showTaskDetail(_ taskList: TaskList, _ task: Task) {
+        push(.taskDetails(taskList: taskList, task: task))
     }
     
     func showNewTask(in listID: String? = nil) {
@@ -127,30 +146,30 @@ class NavigationCoordinator: ObservableObject {
         presentSheet(.settings)
     }
     
-    func showSearch(query: String) {
-        push(.searchResults(query: query))
-    }
+//    func showSearch(query: String) {
+//        push(.searchResults(query: query))
+//    }
     
     // MARK: - Deep Linking Support
-    func handleDeepLink(_ url: URL) {
-        // Parse URL and navigate accordingly
-        // Example: tasksapp://task/123
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
-        
-        switch components.host {
-        case "task":
-            if let taskID = components.path.components(separatedBy: "/").last {
-                push(.taskDetail(taskID: taskID))
-            }
-        case "list":
-            if let listID = components.path.components(separatedBy: "/").last {
-                selectedTaskListID = listID
-                selectTab(.tasks)
-            }
-        default:
-            break
-        }
-    }
+//    func handleDeepLink(_ url: URL) {
+//        // Parse URL and navigate accordingly
+//        // Example: tasksapp://task/123
+//        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
+//        
+//        switch components.host {
+//        case "task":
+//            if let taskID = components.path.components(separatedBy: "/").last {
+//                push(.taskDetails(taskList: , task: )(taskID: taskID))
+//            }
+//        case "list":
+//            if let listID = components.path.components(separatedBy: "/").last {
+//                selectedTaskListID = listID
+//                selectTab(.tasks)
+//            }
+//        default:
+//            break
+//        }
+//    }
     
     // MARK: - State Reset
     func reset() {

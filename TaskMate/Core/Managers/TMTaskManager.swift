@@ -66,15 +66,18 @@ class TMTaskManager: ObservableObject {
         }
     }
     
-    // MARK: - Task List Operations
-    func createTaskList(title: String, color: String = "blue") {
+    func createTaskList(title: String, color: String = "system") {
         let taskList = TaskList(context: coreDataManager.context)
+        taskList.id = UUID().uuidString
         taskList.title = title
+        taskList.deleteFlag = false
+        taskList.createdDate = Date()
+        taskList.lastSyncDate = nil
         taskList.color = color
         taskList.position = Int16(taskLists.count)
         
         coreDataManager.save()
-        loadTaskLists()
+//        loadTaskLists()
     }
     
     private func createDefaultList() {
@@ -82,7 +85,7 @@ class TMTaskManager: ObservableObject {
     }
     
     func deleteTaskList(_ taskList: TaskList) {
-        taskList.deletedFlag = true
+        taskList.deleteFlag = true
         
         let tasksInList = tasks.filter { $0.listId == taskList.id }
         tasksInList.forEach { $0.deleteFlag = true }
@@ -95,7 +98,7 @@ class TMTaskManager: ObservableObject {
         }
     }
     
-    func updateTaskList(_ taskList: TaskList, title: String, color: String) {
+    func updateTaskList(_ taskList: TaskList, title: String, color: String?) {
         taskList.title = title
         taskList.color = color
         taskList.lastSyncDate = nil
@@ -104,15 +107,31 @@ class TMTaskManager: ObservableObject {
         loadTaskLists()
     }
     
+    func deleteAllCompletedTasks(_ taskList: TaskList) {
+        if let tasks = taskList.tasks as? Set<Task> {
+            tasks.forEach { task in
+                if task.isCompleted {
+                    task.deleteFlag = true
+                }
+            }
+        }
+    }
+    
     // MARK: - Task Operations
-    func createTask(title: String, notes: String = "", priority: TaskPriority = .medium, dueDate: Date? = nil, listId: String, parentId: String? = nil) {
+    func createTask(title: String, details: String = "", isStarred: Bool = false, isCompleted: Bool = false, notes: String = "", priority: TaskPriority = .medium, dueDate: Date? = nil, deleteFlag: Bool = false, listId: String, parentId: String? = nil) {
         let task = Task(context: coreDataManager.context)
+        task.id = UUID().uuidString
         task.title = title
+        task.details = details
+        task.isStarred = isStarred
+        task.isCompleted = isCompleted
+        task.deleteFlag = deleteFlag
         task.notes = notes
         task.priority = Int16(priority.rawValue)
         task.dueDate = dueDate
         task.listId = listId
         task.parentId = parentId
+        task.createdDate = Date()
         
         let siblingTasks = tasks.filter { $0.listId == listId && $0.parentId == parentId }
         task.position = Int16(siblingTasks.count)
@@ -143,7 +162,7 @@ class TMTaskManager: ObservableObject {
 //        }
     }
     
-    func toggleTask(_ task: Task) {
+    func toggleTaskASComplete(_ task: Task) {
         task.isCompleted.toggle()
         task.completedDate = task.isCompleted ? Date() : nil
         task.lastSyncDate = nil
@@ -157,7 +176,7 @@ class TMTaskManager: ObservableObject {
 //        }
         
         coreDataManager.save()
-        loadTasks()
+//        loadTasks()
         
         //TODO
 //        if task.isCompleted {
@@ -166,20 +185,22 @@ class TMTaskManager: ObservableObject {
 //            NotificationManager.shared.scheduleNotification(for: task)
 //        }
     }
-    
+        
     func deleteTask(_ task: Task) {
         task.deleteFlag = true
-        
-        // Delete subtasks
-//        task.subtasksArray.forEach { $0.isDeleted = true }
-        
+                
         coreDataManager.save()
-        loadTasks()
+//        loadTasks()
         
         //TODO
 //        NotificationManager.shared.cancelNotification(for: task.id)
     }
     
+    func toggleTaskAsStarred(_ task: Task) {
+        task.isStarred.toggle()
+        
+        coreDataManager.save()
+    }
     // MARK: - Filtering
     func filteredTasks(for listId: String) -> [Task] {
         var filtered = tasks.filter { task in

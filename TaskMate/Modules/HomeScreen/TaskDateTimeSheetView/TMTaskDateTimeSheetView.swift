@@ -17,7 +17,7 @@ struct TMTaskDateTimeSheetView: View {
     
     @Binding var selectedDate: Date?
     @Binding var selectedTime: Date?
-    @Binding var repeatOption: RepeatType
+    @Binding var repeatOption: TMRepeatType
     
     @State private var internalSelectedDate: Date = Date()
 
@@ -143,14 +143,14 @@ struct TMTaskDateTimeSheetView: View {
 private struct PreviewWrapper: View {
     @State private var selectedDate: Date? = Date()
     @State private var selectedTime: Date?
-    @State private var repeatOption: RepeatType = .noRepeat
+    @State private var repeatOption: TMRepeatType = .noRepeat
 
     var body: some View {
         TMTaskDateTimeSheetView(
             selectedDate: $selectedDate, selectedTime: $selectedTime,
             repeatOption: $repeatOption
         )
-        .environmentObject(AppCoordinator())
+        .environmentObject(TMNavigationCoordinator())
     }
 }
 

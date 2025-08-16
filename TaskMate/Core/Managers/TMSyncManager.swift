@@ -50,7 +50,7 @@ class TMSyncManager: ObservableObject {
                     "color": taskList.color ?? "",
                     "position": taskList.position,
                     "createdDate": Timestamp(date: taskList.createdDate ?? Date()),
-                    "deletedFlag": taskList.deletedFlag
+                    "deleteFlag": taskList.deleteFlag
                 ]
                 
                 try await collection.document(taskList.id ?? "").setData(data, merge: true)
@@ -73,7 +73,7 @@ class TMSyncManager: ObservableObject {
                     taskList.title = data["title"] as? String ?? ""
                     taskList.color = data["color"] as? String ?? "blue"
                     taskList.position = Int16(data["position"] as? Int ?? 0)
-                    taskList.deletedFlag = data["deleteFlag"] as? Bool ?? false
+                    taskList.deleteFlag = data["deleteFlag"] as? Bool ?? false
                     if let createdDate = data["createdDate"] as? Timestamp {
                         taskList.createdDate = createdDate.dateValue()
                     }

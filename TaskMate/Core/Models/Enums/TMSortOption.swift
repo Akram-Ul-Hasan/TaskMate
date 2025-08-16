@@ -9,21 +9,45 @@
 import Foundation
 
 enum TMSortOption: String, CaseIterable {
-    case manual = "Manual"
+    case none = "none"
     case dateCreated = "Date Created"
-    case dateModified = "Date Modified"
     case priority = "Priority"
-    case dueDate = "Due Date"
     case alphabetical = "Alphabetical"
     
-    var icon: String {
+    var id: String { rawValue }
+    
+    var title: String {
         switch self {
-        case .manual: return "hand.draw"
-        case .dateCreated: return "calendar.badge.plus"
-        case .dateModified: return "calendar.badge.clock"
-        case .priority: return "exclamationmark.triangle"
-        case .dueDate: return "clock"
-        case .alphabetical: return "textformat.abc"
+        case .none: return "None"
+        case .dateCreated: return "Date Created"
+        case .priority: return "Priority"
+        case .alphabetical: return "Alphabetical"
+        }
+    }
+    
+    var sortDescriptors: [NSSortDescriptor] {
+        switch self {
+        case .none:
+            return [
+                NSSortDescriptor(keyPath: \Task.position, ascending: true),
+                NSSortDescriptor(keyPath: \Task.createdDate, ascending: false)
+            ]
+        case .dateCreated:
+            return [
+                NSSortDescriptor(keyPath: \Task.createdDate, ascending: false),
+                NSSortDescriptor(keyPath: \Task.title, ascending: true)
+            ]
+        case .alphabetical:
+            return [
+                NSSortDescriptor(keyPath: \Task.title, ascending: true),
+                NSSortDescriptor(keyPath: \Task.createdDate, ascending: false)
+            ]
+        case .priority:
+            return [
+                NSSortDescriptor(keyPath: \Task.priority, ascending: false),
+                NSSortDescriptor(keyPath: \Task.dueDate, ascending: true),
+                NSSortDescriptor(keyPath: \Task.createdDate, ascending: false)
+            ]
         }
     }
 }

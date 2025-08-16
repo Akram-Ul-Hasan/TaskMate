@@ -26,9 +26,9 @@
         <relationship name="taskList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskList" inverseName="tasks" inverseEntity="TaskList"/>
     </entity>
     <entity name="TaskList" representedClassName=".TaskList" syncable="YES" codeGenerationType="class">
-        <attribute name="color" attributeType="String"/>
+        <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="createdDate" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="deletedFlag" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="deleteFlag" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="id" attributeType="String"/>
         <attribute name="lastSyncDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="position" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>

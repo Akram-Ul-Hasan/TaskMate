@@ -104,7 +104,7 @@ enum TMSheetRoute: Identifiable, Hashable, CaseIterable {
             .taskOptions(taskID: "sample-task-id"),
             .listOptions(listID: "sample-list-id"),
             .listSelector,
-            .sortFilter(currentSort: .dueDate, currentFilter: .all),
+            .sortFilter(currentSort: .none, currentFilter: .all),
             .settings,
             .account,
             .about

@@ -8,14 +8,14 @@
 import SwiftUI
 
  struct TMRootNavigationView: View {
-     @EnvironmentObject var coordinator: NavigationCoordinator
+     @EnvironmentObject var coordinator: TMNavigationCoordinator
      @Environment(\.managedObjectContext) private var context
      
      var body: some View {
          Group {
              switch coordinator.appState {
              case .splash:
-                 TMWelcomeScreen()
+                 TMSplashView()
                      .onAppear {
                          DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                              coordinator.navigateToMain()
@@ -25,14 +25,11 @@ import SwiftUI
              case .onboarding:
                  TMOnboardingScreen()
                  
-//             case .authentication:
-//                 AuthContainerView()
-//                 
+             case .authentication:
+                 TMLoginView()
+                 
              case .main:
                  TMMainNavigationView()
-                 
-             default:
-                 EmptyView()
              }
          }
          .animation(.easeInOut(duration: 0.3), value: coordinator.appState)

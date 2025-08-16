@@ -7,34 +7,8 @@
 
 import SwiftUI
 
-enum RepeatType: CaseIterable {
-    case noRepeat
-    case daily
-    case weekly
-    case monthly
-    case yearly
-    case custom
-
-    var description: String {
-        switch self {
-        case .noRepeat:
-            return "Does not repeat"
-        case .daily:
-            return "Repeats daily"
-        case .weekly:
-            return "Repeats weekly"
-        case .monthly:
-            return "Repeats monthly"
-        case .yearly:
-            return "Repeats yearly"
-        case .custom:
-            return "Custom repeat"
-        }
-    }
-}
-
 struct TMTaskRepeatSelectionScreen: View {
-    @EnvironmentObject private var coordinator : NavigationCoordinator
+    @EnvironmentObject private var coordinator : TMNavigationCoordinator
     
     var body: some View {
         ScrollView {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TMHomeTaskRowView: View {
-    let task: Task
+    @ObservedObject var task: Task
     let onToggleStar: () -> Void
     let onToggleComplete: () -> Void
 
@@ -24,7 +24,7 @@ struct TMHomeTaskRowView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(task.name ?? "")
+                Text(task.title ?? "")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.primary)
 

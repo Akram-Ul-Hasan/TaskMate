@@ -13,8 +13,7 @@ struct TaskMateApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-//    @StateObject private var appState = TMAppState()
-    @StateObject private var coordinator = NavigationCoordinator()
+    @StateObject private var coordinator = TMNavigationCoordinator()
     @StateObject private var authManager = TMAuthManager.shared
     @StateObject private var taskManager = TMTaskManager()
     @StateObject private var syncManager = TMSyncManager()
@@ -22,7 +21,7 @@ struct TaskMateApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RootNavigationView()
+            TMRootNavigationView()
                 .environmentObject(coordinator)
                 .environmentObject(authManager)
                 .environmentObject(taskManager)
@@ -30,6 +29,9 @@ struct TaskMateApp: App {
                 .environmentObject(settingsManager)
                 .environment(\.managedObjectContext, TMDatabaseManager.shared.context)
                 .preferredColorScheme(settingsManager.theme.colorScheme)
+                .onReceive(authManager.$isAuthenticated) { isAuthenticated in
+                    print("App received auth state change: \(isAuthenticated)")
+                }
             
         }
     }

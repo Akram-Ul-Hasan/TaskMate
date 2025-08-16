@@ -12,7 +12,7 @@ import GoogleSignIn
 import Combine
 
 
-final class TMAuthManager: NSObject, ObservableObject {
+class TMAuthManager: NSObject, ObservableObject {
     static let shared = TMAuthManager()
     
     @Published var isAuthenticated = false
@@ -21,60 +21,81 @@ final class TMAuthManager: NSObject, ObservableObject {
     @Published var errorMessage: String?
     
     private var cancellables = Set<AnyCancellable>()
-
+    private var authStateHandle: AuthStateDidChangeListenerHandle?
+    
     private override init() {
+        super.init()
         setupAuthListener()
     }
     
+    deinit {
+        if let handle = authStateHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
+    }
+    
     private func setupAuthListener() {
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             DispatchQueue.main.async {
                 self?.currentUser = user
                 self?.isAuthenticated = user != nil
+                self?.errorMessage = nil
             }
         }
     }
     
     func signInWithGoogle() {
-        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
-
-        let config = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.configuration = config
-
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootViewController = windowScene.windows.first?.rootViewController else {
+        self.errorMessage = nil
+        
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            errorMessage = "Firebase not properly configured."
             return
         }
-
+        
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            errorMessage = "Unable to find root view controller"
+            return
+        }
+        
         isLoading = true
-
+        
         GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] result, error in
             DispatchQueue.main.async {
                 self?.isLoading = false
-
+                
                 if let error = error {
                     self?.errorMessage = error.localizedDescription
                     return
                 }
-
+                
                 guard let user = result?.user,
                       let idToken = user.idToken?.tokenString else {
                     self?.errorMessage = "Failed to get Google ID token"
                     return
                 }
-
+                
                 let credential = GoogleAuthProvider.credential(withIDToken: idToken,
                                                                accessToken: user.accessToken.tokenString)
-
-                Auth.auth().signIn(with: credential) { authResult, error in
-                    if let error = error {
-                        self?.errorMessage = error.localizedDescription
+                
+                Auth.auth().signIn(with: credential) { [weak self] authResult, error in
+                    DispatchQueue.main.async {
+                        if let error = error {
+                            self?.errorMessage = "Firebase sign-in failed: \(error.localizedDescription)"
+                        } else {
+                            print("Successfully signed in with Google")
+                            self?.isAuthenticated = true
+                            self?.currentUser = authResult?.user
+                        }
                     }
                 }
             }
         }
     }
-
+    
     func signOut() {
         do {
             try Auth.auth().signOut()
@@ -83,6 +104,7 @@ final class TMAuthManager: NSObject, ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+}
     
 //    func signinWithGoogle(presenting: UIViewController, completion: @escaping(Error?) -> Void) {
 //        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
@@ -143,5 +165,5 @@ final class TMAuthManager: NSObject, ObservableObject {
 //            print("Sign out failed: \(error.localizedDescription)")
 //        }
 //    }
-}
+//}
 

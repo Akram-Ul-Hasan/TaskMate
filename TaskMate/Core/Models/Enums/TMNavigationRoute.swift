@@ -8,10 +8,14 @@
 import Foundation
 
 enum TMNavigationRoute: Hashable {
-    case taskDetail(taskID: String)
-    case editTask(taskID: String)
-    case newTaskList
-    case taskListSettings(listID: String)
-    case searchResults(query: String)
+    
+    case tasks
+    case taskDetails(taskList: TaskList, task: Task)
+    case addOrEditTaskList(screenType: TMTaskListScreenType)
+//    case addTask(taskList: TaskList)
+//    case taskListSettings(listID: String)
+//    case searchResults(query: String)
     case completedTasks(listID: String)
+
+
 }

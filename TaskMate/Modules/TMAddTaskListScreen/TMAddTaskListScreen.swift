@@ -7,19 +7,28 @@
 
 import SwiftUI
 
-struct TMAddTaskListScreen: View {
+struct TMAddOrEditTaskListScreen: View {
     
-    @EnvironmentObject private var coordinator : NavigationCoordinator
-    @EnvironmentObject private var db : TMDatabaseManager
-    @State private var taskListTitle = ""
+    @EnvironmentObject private var coordinator : TMNavigationCoordinator
+    @EnvironmentObject private var taskManager : TMTaskManager
     
-    func saveTaskList() {
-//        db.createTaskList(title: taskListTitle)
+    @State private var taskListTitle: String
+
+    let screenType : TMTaskListScreenType
+    
+    init(mode: TMTaskListScreenType) {
+        self.screenType = mode
+        switch mode {
+        case .create:
+            _taskListTitle = .init(initialValue: "")
+        case .edit(let taskList):
+            _taskListTitle = .init(initialValue: taskList.title ?? "")
+        }
     }
-    
+
     var body: some View {
         VStack {
-            TextField("Enter list title", text: $taskListTitle)
+            TextField(screenType.placeholder , text: $taskListTitle)
                 .font(.headline)
                 .foregroundStyle(.blackLevel1)
                 .padding(.horizontal, 20)
@@ -27,26 +36,36 @@ struct TMAddTaskListScreen: View {
                 .background(.whiteLevel1)
             
             Spacer()
-            
-                .navigationTitle("Create new list")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Done") {
-                            saveTaskList()
-                            coordinator.pop()
-                        }
-                        .disabled(taskListTitle.isEmpty)
-                    }
-                }
         }
         .background(.whiteLevel2)
+        .navigationTitle(screenType.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Done") {
+                    saveTaskList()
+                    coordinator.pop()
+                }
+                .disabled(taskListTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+        }
     }
+    
+    private func saveTaskList() {
+        switch screenType {
+        case .create:
+            taskManager.createTaskList(title: taskListTitle)
+        case .edit(let taskList):
+            taskManager.updateTaskList(taskList, title: taskListTitle, color: "")
+        }
+    }
+    
 }
 
-#Preview {
-    NavigationStack {
-        TMAddTaskListScreen()
-        
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        TMAddTaskListScreen()
+//            .environmentObject(TMNavigationCoordinator())
+//            .environmentObject(TMTaskManager())
+//    }
+//}

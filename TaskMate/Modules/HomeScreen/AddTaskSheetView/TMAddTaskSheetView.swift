@@ -10,9 +10,10 @@ import SwiftUI
 struct TMAddTaskSheetView: View {
     
     @EnvironmentObject private var db : TMDatabaseManager
-    @EnvironmentObject private var coordinator : NavigationCoordinator
+    @EnvironmentObject private var coordinator : TMNavigationCoordinator
+    @EnvironmentObject private var taskManager: TMTaskManager
     
-    let taskList: TaskList
+    let taskListId: String
     
     @State private var taskTitle = ""
     @State private var taskDetails = ""
@@ -22,12 +23,12 @@ struct TMAddTaskSheetView: View {
     
     @State private var date: Date? = nil
     @State private var time: Date? = nil
-    @State private var repeatType : RepeatType = .noRepeat
+    @State private var repeatType : TMRepeatType = .noRepeat
 
     @FocusState private var isTitleFieldFocused: Bool
     
     private func saveTask() {
-//        db.createTask(name: taskTitle, details: taskDetails, date: date, time: time, isStarred: isStarred, starredDate: isStarred ? Date() : nil, taskList: taskList)
+        taskManager.createTask(title: taskTitle, details: taskDetails, isStarred: isStarred, listId: taskListId)
     }
     
     var body: some View {
@@ -99,6 +100,6 @@ struct TMAddTaskSheetView: View {
 }
 
 #Preview {
-    let taskList = TaskList()
-    TMAddTaskSheetView(taskList: taskList)
+    let taskListId = "My Todo List"
+    TMAddTaskSheetView(taskListId: taskListId)
 }
