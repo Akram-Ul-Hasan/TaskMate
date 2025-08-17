@@ -13,4 +13,8 @@ enum TMStrings {
         static let emptyTaskDescription = "Add your first task by tapping the plus button above"
         static let newTaskListButtonTitle = "+ New list"
     }
+    
+    enum profile {
+        static let title = "Profile"
+    }
 }

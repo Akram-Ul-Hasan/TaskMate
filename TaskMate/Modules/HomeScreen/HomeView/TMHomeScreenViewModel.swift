@@ -33,11 +33,11 @@ class TMHomeScreenViewModel: ObservableObject {
         
         switch selectedList {
         case .starred:
-            request.predicate = NSPredicate(format: "isStarred == true")
+            request.predicate = NSPredicate(format: "isStarred == true AND deleteFlag == false")
             request.sortDescriptors = [NSSortDescriptor(keyPath: \Task.starredDate, ascending: false)]
             
         case .taskList(let taskList):
-            request.predicate = NSPredicate(format: "listId == %@", taskList.id ?? "")
+            request.predicate = NSPredicate(format: "listId == %@ AND deleteFlag == false", taskList.id ?? "")
             request.sortDescriptors = selectedSort.sortDescriptors
         }
         

@@ -168,24 +168,26 @@ struct TMHomeScreen: View {
     }
     
     private var taskContentSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            if viewModel.filteredTasks.isEmpty {
-                TMEmptyView(imageName: TMImages.emptyTask, title: TMStrings.Home.emptyTaskTitle, subtitle: TMStrings.Home.emptyTaskDescription)
-            } else {
-                ForEach(viewModel.filteredTasks) { task in
-                    TMHomeTaskRowView(task: task, onToggleStar: {
-                        viewModel.toggleStarred(task)
-                    }, onToggleComplete: {
-                        viewModel.markTaskAsCompleted(task)
-                    })
-                    .onTapGesture {
-                        navigateToTaskDetails(task: task)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if viewModel.filteredTasks.isEmpty {
+                    TMEmptyView(imageName: TMImages.emptyTask, title: TMStrings.Home.emptyTaskTitle, subtitle: TMStrings.Home.emptyTaskDescription)
+                } else {
+                    ForEach(viewModel.filteredTasks) { task in
+                        TMHomeTaskRowView(task: task, onToggleStar: {
+                            viewModel.toggleStarred(task)
+                        }, onToggleComplete: {
+                            viewModel.markTaskAsCompleted(task)
+                        })
+                        .onTapGesture {
+                            navigateToTaskDetails(task: task)
+                        }
+                        
                     }
-                    
                 }
             }
+            .padding()
         }
-        .padding()
     }
     
     private func navigateToRenameList() {

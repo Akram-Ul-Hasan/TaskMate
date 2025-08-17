@@ -34,8 +34,8 @@ struct TMHomeTaskRowView: View {
                         .foregroundColor(.gray)
                 }
 
-                if let date = task.date, let time = task.time {
-                    let formatted = format(date: date, time: time)
+                if let dueDate = task.dueDate {
+                    let formatted = formatDate(dueDate)
                     Text(formatted)
                         .font(.system(size: 13))
                         .foregroundColor(.blue)
@@ -60,6 +60,12 @@ struct TMHomeTaskRowView: View {
         .padding(.vertical, 8)
     }
 
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
     private func format(date: Date, time: Date) -> String {
         let calendar = Calendar.current
         let isToday = calendar.isDateInToday(date)

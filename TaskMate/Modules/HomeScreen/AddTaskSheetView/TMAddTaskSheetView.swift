@@ -28,7 +28,7 @@ struct TMAddTaskSheetView: View {
     @FocusState private var isTitleFieldFocused: Bool
     
     private func saveTask() {
-        taskManager.createTask(title: taskTitle, details: taskDetails, isStarred: isStarred, listId: taskListId)
+        taskManager.createTask(title: taskTitle, details: taskDetails, isStarred: isStarred, dueDate: date, dueTime: time, listId: taskListId)
     }
     
     var body: some View {

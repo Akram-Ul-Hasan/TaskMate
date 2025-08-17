@@ -104,28 +104,44 @@ class TMTaskManager: ObservableObject {
         taskList.lastSyncDate = nil
         
         coreDataManager.save()
-        loadTaskLists()
+//        loadTaskLists()
     }
     
     func deleteAllCompletedTasks(_ taskList: TaskList) {
-        if let tasks = taskList.tasks as? Set<Task> {
-            tasks.forEach { task in
-                if task.isCompleted {
+        let context = coreDataManager.context
+        
+        let request: NSFetchRequest<Task> = Task.fetchRequest()
+        request.predicate = NSPredicate(format: "listId == %@ AND isCompleted == true", taskList.id ?? "")
+        
+        do {
+            let completedTasks = try context.fetch(request)
+            
+            if completedTasks.isEmpty {
+                print("No completed tasks found for list: \(taskList.id ?? "nil")")
+            } else {
+                completedTasks.forEach { task in
                     task.deleteFlag = true
                 }
+                try context.save()
+                print("Marked \(completedTasks.count) completed tasks as deleted.")
+                
             }
+            coreDataManager.save()
+
+        } catch {
+            print("Failed to fetch completed tasks: \(error)")
         }
     }
     
     // MARK: - Task Operations
-    func createTask(title: String, details: String = "", isStarred: Bool = false, isCompleted: Bool = false, notes: String = "", priority: TaskPriority = .medium, dueDate: Date? = nil, deleteFlag: Bool = false, listId: String, parentId: String? = nil) {
+    func createTask(title: String, details: String = "", isStarred: Bool = false, notes: String = "", priority: TaskPriority = .medium, dueDate: Date? = nil, dueTime: Date? = nil,  listId: String, parentId: String? = nil) {
         let task = Task(context: coreDataManager.context)
         task.id = UUID().uuidString
         task.title = title
         task.details = details
         task.isStarred = isStarred
-        task.isCompleted = isCompleted
-        task.deleteFlag = deleteFlag
+        task.isCompleted = false
+        task.deleteFlag = false
         task.notes = notes
         task.priority = Int16(priority.rawValue)
         task.dueDate = dueDate
@@ -136,13 +152,25 @@ class TMTaskManager: ObservableObject {
         let siblingTasks = tasks.filter { $0.listId == listId && $0.parentId == parentId }
         task.position = Int16(siblingTasks.count)
         
+        if let date = dueDate, let time = dueTime {
+            task.dueDate = merge(date: date, time: time)
+        } else if let date = dueDate {
+            task.dueDate = merge(date: date, time: Date(timeIntervalSince1970: 0))
+        } else if let time = dueTime {
+            task.dueDate = merge(date: Date(), time: time)
+        } else {
+            task.dueDate = nil
+        }
+        
         coreDataManager.save()
-        loadTasks()
+//        loadTasks()
+        
+        print(task.dueDate)
         
         //TODO
-//        if let dueDate = dueDate {
-//            TMNotificationManager.shared.scheduleNotification(for: task)
-//        }
+        //        if let dueDate = dueDate {
+        //            TMNotificationManager.shared.scheduleNotification(for: task)
+        //        }
     }
     
     func updateTask(_ task: Task, title: String, notes: String, priority: TaskPriority, dueDate: Date?) {
@@ -200,6 +228,21 @@ class TMTaskManager: ObservableObject {
         task.isStarred.toggle()
         
         coreDataManager.save()
+    }
+    
+    private func merge(date: Date, time: Date) -> Date {
+        let calendar = Calendar.current
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
+        
+        var merged = DateComponents()
+        merged.year = dateComponents.year
+        merged.month = dateComponents.month
+        merged.day = dateComponents.day
+        merged.hour = timeComponents.hour
+        merged.minute = timeComponents.minute
+        
+        return calendar.date(from: merged) ?? date
     }
     // MARK: - Filtering
     func filteredTasks(for listId: String) -> [Task] {

@@ -11,6 +11,10 @@ import SwiftUI
 struct TMMainNavigationView: View {
     @EnvironmentObject var coordinator: TMNavigationCoordinator
     @EnvironmentObject var taskManager: TMTaskManager
+    @EnvironmentObject var authManager: TMAuthManager
+    @EnvironmentObject var notificationManager: TMNotificationManager
+    @EnvironmentObject var settingsManager: TMSettingsManager
+    
     @Environment(\.managedObjectContext) private var context
     
     var body: some View {
@@ -45,8 +49,8 @@ struct TMMainNavigationView: View {
             TMHomeScreen(viewModel: TMHomeScreenViewModel(context: context, taskManager: taskManager))
 //        case .search:
 //            SearchView()
-//        case .account:
-//            AccountView()
+        case .profile:
+            TMProfileScreen(viewModel:  TMProfileViewModel(authManager: authManager, notificationManager: notificationManager, settingsManager: settingsManager))
         case .upcoming:
             TMUpcomingTasksView()
         }

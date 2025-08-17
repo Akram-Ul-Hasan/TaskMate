@@ -17,6 +17,7 @@ struct TaskMateApp: App {
     @StateObject private var authManager = TMAuthManager.shared
     @StateObject private var taskManager = TMTaskManager()
     @StateObject private var syncManager = TMSyncManager()
+    @StateObject private var notificationManger = TMNotificationManager.shared
     @StateObject private var settingsManager = TMSettingsManager.shared
     
     var body: some Scene {
@@ -27,6 +28,7 @@ struct TaskMateApp: App {
                 .environmentObject(taskManager)
                 .environmentObject(syncManager)
                 .environmentObject(settingsManager)
+                .environmentObject(notificationManger)
                 .environment(\.managedObjectContext, TMDatabaseManager.shared.context)
                 .preferredColorScheme(settingsManager.theme.colorScheme)
                 .onReceive(authManager.$isAuthenticated) { isAuthenticated in
